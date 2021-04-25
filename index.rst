@@ -3,5 +3,5 @@ $project
 
 .. toctree::
     
-    gitea
-    influxdb
+    services/Gitea
+    services/InfluxDB
