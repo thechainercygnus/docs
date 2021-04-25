@@ -11,5 +11,5 @@ Here's some stuff
     :hidden:
     :caption: Documents
 
-    /services/gitea
-    /services/influxdb
+    /gitea
+    /influxdb
