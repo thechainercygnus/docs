@@ -21,7 +21,6 @@ Virtual Machine Configuration
 The following walks through a net install of Ubuntu 20.04. Modify vcpus ram and disk size as needed. Walk through configuration options as required, being sure to install OpenSSH Server when package selection occurs. This walkthrough presupposes you use the same hostname for your intial user as you do on your primary workstation. If you prefer to use different names, please be sure to prepend usernames in all ssh commands.
 
 .. code-block:: shell-session
-    :linenos:
 
     brycej@shioxhast:~$ sudo virt-install --name gitea \
         --network mac=00:0C:53:00:00:04 \ # Make sure you match your DNS / DHCP entries
@@ -37,7 +36,6 @@ The following walks through a net install of Ubuntu 20.04. Modify vcpus ram and 
 Copy your ssh-key to the new VM and verify you can access.
 
 .. code-block:: shell-session
-    :linenos:
 
     brycej@shioxhast:~$ ssh-copy-id {yourhostname}
     /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
@@ -58,7 +56,6 @@ Application Environment Configuration
 Install git and create the git user that will run Gitea.
 
 .. code-block:: shell-session
-    :linenos:
 
     brycej@gitea:~$ sudo apt update && sudo apt install git -y
     brycej@gitea:~$ sudo adduser \
@@ -73,7 +70,6 @@ Install git and create the git user that will run Gitea.
 Install PostgreSQL and configure for use
 
 .. code-block:: shell-session
-    :linenos:
 
     brycej@gitea:~$ sudo apt install postgresql -y
     brycej@gitea:~$ sudo su postgres
@@ -88,7 +84,6 @@ Install PostgreSQL and configure for use
 Now we can use the git user we created before to download and run Gitea for initial configuration.
 
 .. code-block:: shell-session
-    :linenos:
 
     brycej@gitea:~$ sudo su git
     git@gitea:/home/brycej$ cd ~
@@ -104,7 +99,6 @@ Now we can use the git user we created before to download and run Gitea for init
 Add the following to the gitea.service file:
 
 .. code-block:: shell-session
-    :linenos:
 
     [Unit]
     Description=Gitea (Git with a cup of tea)
@@ -128,7 +122,6 @@ Add the following to the gitea.service file:
 Save the file and now we can start the service. Verify you can access the web interface at {yourhostname}:3000 after these steps. 
 
 .. code-block:: shell-session
-    :linenos:
 
     brycej@gitea sudo systemctl enable gitea.service
     brycej@gitea sudo systemctl start gitea.service
@@ -139,7 +132,6 @@ Install and Configure Nginx
 Install Nginx and create a new sites-enabled file for the Gitea.
 
 .. code-block:: shell-session
-    :linenos:
 
     brycej@gitea:~$ sudo apt install nginx -y
     brycej@gitea:~$ sudo nano /etc/nginx/sites-enabled/gitea
@@ -158,46 +150,9 @@ Install Nginx and create a new sites-enabled file for the Gitea.
 For sanitary purposes let's remove the default site and then we can reload nginx. Once this is done, we can access gitea by visting http://{yourhostname} now.
 
 .. code-block:: shell-session
-    :linenos:
 
     brycej@gitea:~$ sudo rm /etc/nginx/sites-enabled/default
     brycej@gitea:~$ sudo service nginx reload
-
-Install and Configure fail2ban
-------------------------------
-
-This is one of those things that I think you just do, right? Anyways, I'm not planning on exposing my git server to the wide world, but I may eventually grant remote access to someone for a project, in which case I might as well have some protection in place right? Plus It's fun to learn new tools.
-
-As usual, install and configure
-
-.. code-block:: shell-session
-    :linenos:
-
-    brycej@gitea:~$ sudo apt install fail2ban -y
-    brycej@gitea:~$ sudo nano /etc/fail2ban/filter.d/gitea.conf
-
-    [Definition]
-    failregex =  .*Failed authentication attempt for .* from <HOST>
-    ignoreregex =
-
-    brycej@gitea:~$ sudo nano /etc/fail2ban/jail.d/jail.local
-
-    [gitea]
-    enabled = true
-    port = http,https
-    filter = gitea
-    logpath = /home/git/gitea/log/gitea.log
-    maxretry = 10
-    findtime = 3600
-    bantime = 900
-    action = iptables-allports
-
-And the usual restart after configuration changes.
-
-.. code-block:: shell-session
-    :linenos:
-
-    brycej@gitea:~$ sudo service fail2ban restart
 
 Generating an SSL Certificate
 -----------------------------
@@ -205,7 +160,6 @@ Generating an SSL Certificate
 Even if I am only hosting internally for my own usage, I like knowing my traffic is encrypted. And for things like this, the best tool I have found is to just use certbot itself to generate the cert. We also will need to store our Cloudflare API Token somewhere accessible.
 
 .. code-block:: shell-session
-    :linenos:
 
     brycej@gitea:~$ sudo apt install software-properties-common snapd -y
     brycej@gitea:~$ sudo snap install certbot --classic
@@ -216,7 +170,6 @@ Even if I am only hosting internally for my own usage, I like knowing my traffic
 Now we have to set up the environment real quick. Should I set permissions on cloudflare.ini differently? Check certbot docs
 
 .. code-block:: shell-session
-    :linenos:
 
     brycej@gitea:~$ mkdir .secrets
     brycej@gitea:~$ mkdir .secrets/certbot
@@ -227,7 +180,6 @@ Now we have to set up the environment real quick. Should I set permissions on cl
 Now we can generate the certificate.
 
 .. code-block:: shell-session
-    :linenos:
 
     brycej@gitea:~$ certbot certonly \
     brycej@gitea:~$ --dns-cloudflare \
@@ -241,7 +193,6 @@ Reconfigure Nginx to use SSL
 Not that we have our SSL Certificate we can reconfigure Nginx to use SSL.
 
 .. code-block:: shell-session
-    :linenos:
 
     brycej@gitea:~$ sudo nano /etc/nginx/sites-enabled/gitea
     
@@ -269,7 +220,6 @@ Configure Certificate Auto-Renewal
 The only problem with LE Certs is that they have short expirations. 3 months, to be exact. So we can configure the system to maintain it's own certificate.
 
 .. code-block:: shell-session
-    :linenos:
 
     brycej@gitea:~$ sudo nano /etc/systemd/system/certbot-renewal.service
 
@@ -296,4 +246,75 @@ The only problem with LE Certs is that they have short expirations. 3 months, to
 
 In admin go to System Administration and run the `Update the '.ssh/authorized_keys' file with Gtea SSH keys.` operation.
 
-Done
+Install and Configure fail2ban
+------------------------------
+
+This is one of those things that I think you just do, right? Anyways, I'm not planning on exposing my git server to the wide world, but I may eventually grant remote access to someone for a project, in which case I might as well have some protection in place right? Plus It's fun to learn new tools.
+
+As usual, install and configure
+
+.. code-block:: shell-session
+
+    brycej@gitea:~$ sudo apt install fail2ban -y
+    brycej@gitea:~$ sudo nano /etc/fail2ban/filter.d/gitea.conf
+
+    [Definition]
+    failregex =  .*Failed authentication attempt for .* from <HOST>
+    ignoreregex =
+
+    brycej@gitea:~$ sudo nano /etc/fail2ban/jail.d/jail.local
+
+    [gitea]
+    enabled = true
+    port = http,https
+    filter = gitea
+    logpath = /home/git/gitea/log/gitea.log
+    maxretry = 10
+    findtime = 3600
+    bantime = 900
+    action = iptables-allports
+
+And the usual restart after configuration changes.
+
+.. code-block:: shell-session
+
+    brycej@gitea:~$ sudo service fail2ban restart
+
+Configure UFW
+-------------
+
+UFW configuration is relatively simple for this use case. Allowing OpenSSH and Nginx HTTPS traffic gives us all the connections we ultimately need.
+
+.. code-block:: shell-session
+
+    brycej@gitea:~$ sudo ufw allow OpenSSH
+    Rules updated
+    Rules updated (v6)
+    brycej@gitea:~$ sudo ufw allow 'Nginx HTTPS'
+    Rules updated
+    Rules updated (v6)
+    brycej@gitea:~$ sudo ufw enable
+    Command may disrupt existing ssh connections. Proceed with operation (y|n)? y
+    Firewall is active and enabled on system startup
+    brycej@gitea:~$ sudo ufw status
+    Status: active
+
+    To                         Action      From
+    --                         ------      ----
+    OpenSSH                    ALLOW       Anywhere
+    Nginx HTTPS                ALLOW       Anywhere
+    OpenSSH (v6)               ALLOW       Anywhere (v6)
+    Nginx HTTPS (v6)           ALLOW       Anywhere (v6)
+
+Configure OpenSSH
+-----------------
+
+This is some standard OpenSSH configuration that I push to all servers.
+
+.. code-block:: shell-session
+
+    brycej@gitea:~$ sudo nano /etc/ssh/sshd_config
+    PermitRootLogin no
+    PasswordAuthentication no
+    brycej@gitea:~$ sudo /etc/init.d/ssh reload
+    Reloading ssh configuration (via systemctl): ssh.service.
