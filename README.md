@@ -1,0 +1,3 @@
+# docs
+
+My documentation repository.
