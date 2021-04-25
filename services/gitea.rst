@@ -1,6 +1,9 @@
-=====
 Gitea
 =====
+
+.. meta::
+   :description lang=en: Installation and Configuration of Gitea
+
 Installation notes
 -----
 
