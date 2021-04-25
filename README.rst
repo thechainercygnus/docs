@@ -1,6 +1,3 @@
-$project
-========
-
 .. toctree::
     
     services/Gitea
