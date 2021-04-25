@@ -23,7 +23,7 @@ The following walks through a net install of Ubuntu 20.04. Modify vcpus ram and 
 .. code-block:: shell-session
     :linenos:
 
-    {user}@{host} $ sudo virt-install --name gitea \
+    brycej@shioxhast:~$ sudo virt-install --name gitea \
         --network mac=00:0C:53:00:00:04 \ # Make sure you match your DNS / DHCP entries
         --ram=1024 \
         --disk size=100 \
@@ -39,16 +39,16 @@ Copy your ssh-key to the new VM and verify you can access.
 .. code-block:: shell-session
     :linenos:
 
-    {user}@{host} $ ssh-copy-id {yourhostname}
+    brycej@shioxhast:~$ ssh-copy-id {yourhostname}
     /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
     /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
-    {user}@{yourhostname}'s password:
+    brycej@{yourhostname}'s password:
 
     Number of key(s) added: 1
 
     Now try logging into the machine, with:   "ssh '{yourhostname}'"
 
-    {user}@{host} $ ssh {yourhostname}
+    brycej@shioxhast:~$ ssh {yourhostname}
 
 You should now be logged into your Virtual Machine via SSH. Stay in this remote session for the remaining tasks.
 
@@ -60,8 +60,8 @@ Install git and create the git user that will run Gitea.
 .. code-block:: shell-session
     :linenos:
 
-    {user}@gitea $ sudo apt update && sudo apt install git -y
-    {user}@gitea $ sudo adduser \
+    brycej@gitea:~$ sudo apt update && sudo apt install git -y
+    brycej@gitea:~$ sudo adduser \
         --system \
         --shell /bin/bash \
         --gecos 'Git Version Control' \
@@ -75,31 +75,31 @@ Install PostgreSQL and configure for use
 .. code-block:: shell-session
     :linenos:
 
-    {user}@gitea $ sudo apt install postgresql -y
-    {user}@gitea $ sudo su postgres
-    postgres@gitea $ psql
+    brycej@gitea:~$ sudo apt install postgresql -y
+    brycej@gitea:~$ sudo su postgres
+    postgres@gitea:/home/brycej$ psql
     postgres=# CREATE USER gitea WITH PASSWORD '<password>';
     CREATE ROLE
     postgres=# CREATE DATABASE gitea OWNER gitea;
     CREATE DATABASE
     postgres=# \q
-    postgres@gitea $ exit
+    postgres@gitea:~$ exit
 
 Now we can use the git user we created before to download and run Gitea for initial configuration.
 
 .. code-block:: shell-session
     :linenos:
 
-    {user}@gitea $ sudo su git
-    git@gitea $ cd ~
-    git@gitea $ mkdir gitea
-    git@gitea $ cd gitea
-    git@gitea $ wget -O gitea https://dl.gitea.io/gitea/1.14.1/gitea-1.14.1-linux-amd64
-    git@gitea $ chmod +x gitea
-    git@gitea $ ./gitea web
+    brycej@gitea:~$ sudo su git
+    git@gitea:/home/brycej$ cd ~
+    git@gitea:~$ mkdir gitea
+    git@gitea:~$ cd gitea
+    git@gitea:~$ wget -O gitea https://dl.gitea.io/gitea/1.14.1/gitea-1.14.1-linux-amd64
+    git@gitea:~$ chmod +x gitea
+    git@gitea:~$ ./gitea web
     # Run through web setup at {yourhostname}:3000
-    {user}@gitea $ exit
-    {user}@gitea $ sudo nano /etc/systemd/system/gitea.service
+    brycej@gitea:~$ exit
+    brycej@gitea:~$ sudo nano /etc/systemd/system/gitea.service
 
 Add the following to the gitea.service file:
 
@@ -130,8 +130,8 @@ Save the file and now we can start the service. Verify you can access the web in
 .. code-block:: shell-session
     :linenos:
 
-    {user}@gitea sudo systemctl enable gitea.service
-    {user}@gitea sudo systemctl start gitea.service
+    brycej@gitea sudo systemctl enable gitea.service
+    brycej@gitea sudo systemctl start gitea.service
 
 Install and Configure Nginx
 ---------------------------
@@ -141,8 +141,8 @@ Install Nginx and create a new sites-enabled file for the Gitea.
 .. code-block:: shell-session
     :linenos:
 
-    {user}@gitea $ sudo apt install nginx -y
-    {user}@gitea $ sudo nano /etc/nginx/sites-enabled/gitea
+    brycej@gitea:~$ sudo apt install nginx -y
+    brycej@gitea:~$ sudo nano /etc/nginx/sites-enabled/gitea
 
     server {
         listen 80;
@@ -160,8 +160,8 @@ For sanitary purposes let's remove the default site and then we can reload nginx
 .. code-block:: shell-session
     :linenos:
 
-    {user}@gitea $ sudo rm /etc/nginx/sites-enabled/default
-    {user}@gitea $ sudo service nginx reload
+    brycej@gitea:~$ sudo rm /etc/nginx/sites-enabled/default
+    brycej@gitea:~$ sudo service nginx reload
 
 Install and Configure fail2ban
 ------------------------------
@@ -173,14 +173,14 @@ As usual, install and configure
 .. code-block:: shell-session
     :linenos:
 
-    {user}@gitea $ sudo apt install fail2ban -y
-    {user}@gitea $ sudo nano /etc/fail2ban/filter.d/gitea.conf
+    brycej@gitea:~$ sudo apt install fail2ban -y
+    brycej@gitea:~$ sudo nano /etc/fail2ban/filter.d/gitea.conf
 
     [Definition]
     failregex =  .*Failed authentication attempt for .* from <HOST>
     ignoreregex =
 
-    {user}@gitea $ sudo nano /etc/fail2ban/jail.d/jail.local
+    brycej@gitea:~$ sudo nano /etc/fail2ban/jail.d/jail.local
 
     [gitea]
     enabled = true
@@ -197,7 +197,7 @@ And the usual restart after configuration changes.
 .. code-block:: shell-session
     :linenos:
 
-    {user}@gitea $ sudo service fail2ban restart
+    brycej@gitea:~$ sudo service fail2ban restart
 
 Generating an SSL Certificate
 -----------------------------
@@ -207,20 +207,20 @@ Even if I am only hosting internally for my own usage, I like knowing my traffic
 .. code-block:: shell-session
     :linenos:
 
-    {user}@gitea $ sudo apt install software-properties-common snapd -y
-    {user}@gitea $ sudo snap install certbot --classic
-    {user}@gitea $ sudo ln -s /snap/bin/certbot /usr/bin/certbot
-    {user}@gitea $ sudo snap set certbot trust-plugin-with-root=ok
-    {user}@gitea $ sudo snap install certbot-dns-cloudflare
+    brycej@gitea:~$ sudo apt install software-properties-common snapd -y
+    brycej@gitea:~$ sudo snap install certbot --classic
+    brycej@gitea:~$ sudo ln -s /snap/bin/certbot /usr/bin/certbot
+    brycej@gitea:~$ sudo snap set certbot trust-plugin-with-root=ok
+    brycej@gitea:~$ sudo snap install certbot-dns-cloudflare
 
 Now we have to set up the environment real quick. Should I set permissions on cloudflare.ini differently? Check certbot docs
 
 .. code-block:: shell-session
     :linenos:
 
-    {user}@gitea $ mkdir .secrets
-    {user}@gitea $ mkdir .secrets/certbot
-    {user}@gitea $ nano .secrets/certbot/cloudflare.ini 
+    brycej@gitea:~$ mkdir .secrets
+    brycej@gitea:~$ mkdir .secrets/certbot
+    brycej@gitea:~$ nano .secrets/certbot/cloudflare.ini 
 
     dns_cloudflare_api_token = 0123456789abcdef0123456789abcdef01234567
 
@@ -229,8 +229,8 @@ Now we can generate the certificate.
 .. code-block:: shell-session
     :linenos:
 
-    {user}@gitea $ certbot certonly \
-    {user}@gitea $ --dns-cloudflare \
+    brycej@gitea:~$ certbot certonly \
+    brycej@gitea:~$ --dns-cloudflare \
                    --dns-cloudflare-credentials ~/.secrets/certbot/cloudflare.ini \
                    -d {yourhostname}
 
@@ -243,7 +243,7 @@ Not that we have our SSL Certificate we can reconfigure Nginx to use SSL.
 .. code-block:: shell-session
     :linenos:
 
-    {user}@gitea $ sudo nano /etc/nginx/sites-enabled/gitea
+    brycej@gitea:~$ sudo nano /etc/nginx/sites-enabled/gitea
     
     server {
         listen 443;
@@ -261,7 +261,7 @@ Not that we have our SSL Certificate we can reconfigure Nginx to use SSL.
         proxy_set_header X-Real-IP $remote_addr;
     }
 
-    {user}@gitea $ sudo service nginx reload
+    brycej@gitea:~$ sudo service nginx reload
 
 Configure Certificate Auto-Renewal
 ----------------------------------
@@ -271,7 +271,7 @@ The only problem with LE Certs is that they have short expirations. 3 months, to
 .. code-block:: shell-session
     :linenos:
 
-    {user}@gitea $ sudo nano /etc/systemd/system/certbot-renewal.service
+    brycej@gitea:~$ sudo nano /etc/systemd/system/certbot-renewal.service
 
     [Unit]
     Description=Certbot Renewal
@@ -279,7 +279,7 @@ The only problem with LE Certs is that they have short expirations. 3 months, to
     [Service]
     ExecStart=/usr/bin/certbot renew
 
-    {user}@gitea $ sudo nano /etc/systemd/system/certbot-renewal.timer
+    brycej@gitea:~$ sudo nano /etc/systemd/system/certbot-renewal.timer
 
     [Unit]
     Description=Timer for Certbot Renewal
@@ -291,8 +291,8 @@ The only problem with LE Certs is that they have short expirations. 3 months, to
     [Install]
     WantedBy=multi-user.target
 
-    {user}@gitea $ sudo systemctl enable certbot-renewal.timer
-    {user}@gitea $ sudo systemctl start certbot-renewal.timer
+    brycej@gitea:~$ sudo systemctl enable certbot-renewal.timer
+    brycej@gitea:~$ sudo systemctl start certbot-renewal.timer
 
 In admin go to System Administration and run the `Update the '.ssh/authorized_keys' file with Gtea SSH keys.` operation.
 

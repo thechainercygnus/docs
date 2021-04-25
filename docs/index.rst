@@ -4,12 +4,12 @@ durish: Docs
 Services
 --------
 
-Here's some stuff
+My install guides for Gitea and InfluxDB 2.0 are located here.
 
 .. toctree::
     :maxdepth: 2
     :hidden:
-    :caption: Documents
+    :caption: Services
 
     /gitea
     /influxdb
