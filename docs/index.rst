@@ -3,5 +3,5 @@
     :hidden:
     :caption: Documents
 
-    /services/Gitea
-    /services/InfluxDB
+    /services/gitea
+    /services/influxdb
