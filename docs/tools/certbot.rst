@@ -13,7 +13,7 @@ Configuration
 
 https://certbot.eff.org/docs/using.html#using-ecdsa-keys
 
-.. code-section:: shell-session
+.. code-block:: shell-session
 
     brycej@gitea:~$ wget https://url.to.git/repo/config/certbot.ini
     brycej@gitea:~$ sudo mv certbot.ini /etc/letsencrypt/
