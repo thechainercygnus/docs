@@ -9,7 +9,9 @@ My install guides for Gitea and InfluxDB 2.0 are located here.
 .. toctree::
     :maxdepth: 2
     :hidden:
-    :caption: Services
+    :caption: Guides
 
-    /gitea
-    /influxdb
+    /intro/host
+    /intro/security
+    /services/gitea
+    /services/influxdb
