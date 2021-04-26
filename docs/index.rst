@@ -27,8 +27,16 @@ These are docs that I generate as I work on automating things for my environment
 .. toctree::
     :maxdepth: 2
     :hidden:
-    :caption: Services
+    :caption: Services (VMs)
 
     /services/gitea
     /services/influxdb
     /services/grafana
+    /services/docker
+
+.. toctree::
+    :maxdepth: 2
+    :hidden:
+    :caption: Services (Containers)
+
+    /containers/heimdall
