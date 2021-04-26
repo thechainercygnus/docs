@@ -49,7 +49,6 @@ Now we download the tarball and install the service
    # The bind address used by the HTTP service.
    bind-address = ":8086"
 
-   brycej@influxdb:~$ sudo ufw allow OpenSSH
    brycej@influxdb:~$ sudo ufw allow 8086/tcp
    brycej@influxdb:~$ sudo ufw enable
    brycej@influxdb:~$ influx

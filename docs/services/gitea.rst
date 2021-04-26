@@ -287,9 +287,6 @@ UFW configuration is relatively simple for this use case. Allowing OpenSSH and N
 
 .. code-block:: shell-session
 
-    brycej@gitea:~$ sudo ufw allow OpenSSH
-    Rules updated
-    Rules updated (v6)
     brycej@gitea:~$ sudo ufw allow 'Nginx HTTPS'
     Rules updated
     Rules updated (v6)
@@ -305,16 +302,3 @@ UFW configuration is relatively simple for this use case. Allowing OpenSSH and N
     Nginx HTTPS                ALLOW       Anywhere
     OpenSSH (v6)               ALLOW       Anywhere (v6)
     Nginx HTTPS (v6)           ALLOW       Anywhere (v6)
-
-Configure OpenSSH
------------------
-
-This is some standard OpenSSH configuration that I push to all servers.
-
-.. code-block:: shell-session
-
-    brycej@gitea:~$ sudo nano /etc/ssh/sshd_config
-    PermitRootLogin no
-    PasswordAuthentication no
-    brycej@gitea:~$ sudo /etc/init.d/ssh reload
-    Reloading ssh configuration (via systemctl): ssh.service.
