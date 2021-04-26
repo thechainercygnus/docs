@@ -18,15 +18,6 @@ https://certbot.eff.org/docs/using.html#using-ecdsa-keys
     brycej@gitea:~$ wget https://url.to.git/repo/config/certbot.ini
     brycej@gitea:~$ sudo mv certbot.ini /etc/letsencrypt/
 
-    # This is an example of the kind of things you can do in a configuration file.
-    # All flags used by the client can be configured here. Run Certbot with
-    # "--help" to learn more about the available options.
-    #
-    # Note that these options apply automatically to all use of Certbot for
-    # obtaining or renewing certificates, so options specific to a single
-    # certificate on a system with several certificates should not be placed
-    # here.
-
     # Use ECC for the private key
     key-type = ecdsa
     elliptic-curve = secp384r1
@@ -35,22 +26,9 @@ https://certbot.eff.org/docs/using.html#using-ecdsa-keys
     rsa-key-size = 4096
 
     # Uncomment and update to register with the specified e-mail address
-    # email = foo@example.com
-
-    # Uncomment to use the standalone authenticator on port 443
-    # authenticator = standalone
-
-    # Uncomment to use the webroot authenticator. Replace webroot-path with the
-    # path to the public_html / webroot folder being served by your web server.
-    # authenticator = webroot
-    # webroot-path = /usr/share/nginx/html
+    email = foo@example.com
 
     # Uncomment to automatically agree to the terms of service of the ACME server
-    # agree-tos = true
-
-    # An example of using an alternate ACME server that uses EAB credentials
-    # server = https://acme.sectigo.com/v2/InCommonRSAOV
-    # eab-kid = somestringofstuffwithoutquotes
-    # eab-hmac-key = yaddayaddahexhexnotquoted
+    agree-tos = true
 
 More changes?
